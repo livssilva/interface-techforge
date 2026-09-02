@@ -15,6 +15,7 @@ export function PListagemCategoria() {
     setErro(false);
     try {
       const dados = await CategoriaRequests.listarTodas();
+      console.log("Dados recebidos da API /categorias:", dados);
       setCategorias(dados);
     } catch (error) {
       setErro(true);
@@ -48,17 +49,25 @@ export function PListagemCategoria() {
         <table className="tabela-categorias">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>ID Categoria</th>
               <th>Nome</th>
+              <th>Descrição</th>
             </tr>
           </thead>
           <tbody>
-            {categorias.map((cat) => (
-              <tr key={cat.id_categoria}>
-                <td>{cat.id_categoria ?? "-"}</td>
-                <td>{cat.nome}</td>
-              </tr>
-            ))}
+            {categorias.map((cat: any, index) => {
+              const idCategoria = cat.id_categoria ?? cat.id ?? cat.idCategoria ?? "-";
+              const nome = cat.nome ?? cat.nomeCategoria ?? "-";
+              const descricao = cat.descricao ?? cat.descricao_categoria ?? "-";
+
+              return (
+                <tr key={idCategoria !== "-" ? idCategoria : index}>
+                  <td>{idCategoria}</td>
+                  <td>{nome}</td>
+                  <td>{descricao}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}

@@ -7,7 +7,9 @@ export class CategoriaRequests {
     try {
       const response = await fetch(API_URL);
       if (!response.ok) throw new Error('Erro ao buscar categorias.');
-      return await response.json();
+      
+      const dados = await response.json();
+      return Array.isArray(dados) ? dados : [];
     } catch (error) {
       console.error('Erro em CategoriaRequests.listarTodas:', error);
       throw error;
