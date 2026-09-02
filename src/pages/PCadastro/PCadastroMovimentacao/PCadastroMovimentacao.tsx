@@ -1,13 +1,28 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MovimentacaoRequests } from "../../../fetch/MovimentacaoRequests";
-import "./PCadastroMovimentacao.css";
+import "../PCadastroProduto/PCadastroProduto.css";
+
+const OPCOES_TIPO = [
+  "Entrada",
+  "Saída"
+];
+
+const OPCOES_PRODUTOS = [
+  "Teclado Mecânico RGB",
+  "Mouse Sem Fio 16000 DPI",
+  "Monitor 24\" 144Hz",
+  "SSD NVMe 1TB",
+  "Headset 7.1 Surround",
+  "Cadeira Gamer Ergonomica"
+];
 
 export function PCadastroMovimentacao() {
   const navigate = useNavigate();
-  const [idProduto, setIdProduto] = useState("");
-  const [tipo, setTipo] = useState("ENTRADA");
-  const [quantidade, setQuantidade] = useState("");
+  const [produtoId, setProdutoId] = useState("");
+  const [tipo, setTipo] = useState("");
+  const [quantidade, setQuantidade] = useState<number | "">(1);
+  const [data, setData] = useState(new Date().toISOString().split('T')[0]);
   const [observacao, setObservacao] = useState("");
   
   // Estado para controlar o sucesso do cadastro
@@ -17,17 +32,18 @@ export function PCadastroMovimentacao() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (!idProduto || !quantidade) {
-      alert("Por favor, preencha o ID do produto e a quantidade.");
+    if (!produtoId || !tipo || !quantidade || Number(quantidade) <= 0) {
+      alert("Por favor, preencha todos os campos obrigatórios corretamente.");
       return;
     }
 
     setCarregando(true);
 
     const novaMovimentacao: any = {
-      id_produto: Number(idProduto),
+      produtoId,
       tipo,
       quantidade: Number(quantidade),
+      data,
       observacao
     };
 
@@ -38,7 +54,7 @@ export function PCadastroMovimentacao() {
     if (sucesso) {
       setCadastradoComSucesso(true);
     } else {
-      alert("Erro ao cadastrar movimentação. Tente novamente.");
+      alert("Erro ao registrar movimentação. Tente novamente.");
     }
   };
 
@@ -52,7 +68,7 @@ export function PCadastroMovimentacao() {
               ✓ Movimentação Registrada com Sucesso!
             </h2>
             <p style={{ color: "#94a3b8", marginBottom: "24px" }}>
-              A movimentação de estoque foi atualizada no banco de dados.
+              A movimentação foi adicionada ao seu banco de dados.
             </p>
             
             <button 
@@ -60,27 +76,32 @@ export function PCadastroMovimentacao() {
               className="btn-salvar"
               style={{ width: "100%", cursor: "pointer" }}
             >
-              ← Voltar para o Histórico de Movimentações
+              ← Voltar para a Listagem de Movimentações
             </button>
           </div>
         ) : (
           /* Formulário de Cadastro */
           <>
             <Link to="/movimentacoes" style={{ color: "#38bdf8", textDecoration: "none" }}>
-              ← Voltar para Histórico
+              ← Voltar para Listagem
             </Link>
-            <h2 style={{ margin: "16px 0" }}>Cadastrar Nova Movimentação</h2>
+            <h2 style={{ margin: "16px 0" }}>Registrar Movimentação</h2>
 
             <form onSubmit={handleSubmit} className="cadastro-form">
               <div className="form-group">
-                <label>ID do Produto:</label>
-                <input 
-                  type="number"
+                <label>Selecione o Produto:</label>
+                <select 
                   required 
-                  value={idProduto} 
-                  onChange={(e) => setIdProduto(e.target.value)}
-                  placeholder="Ex: 1"
-                />
+                  value={produtoId} 
+                  onChange={(e) => setProdutoId(e.target.value)}
+                >
+                  <option value="">-- Escolha um produto --</option>
+                  {OPCOES_PRODUTOS.map((item, index) => (
+                    <option key={index} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="form-group">
@@ -90,35 +111,48 @@ export function PCadastroMovimentacao() {
                   value={tipo} 
                   onChange={(e) => setTipo(e.target.value)}
                 >
-                  <option value="ENTRADA">ENTRADA</option>
-                  <option value="SAIDA">SAÍDA</option>
+                  <option value="">-- Escolha o tipo --</option>
+                  {OPCOES_TIPO.map((item, index) => (
+                    <option key={index} value={item}>
+                      {item}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="form-group">
                 <label>Quantidade:</label>
                 <input 
-                  type="number" 
+                  type="number"
                   min="1"
-                  required 
-                  value={quantidade} 
-                  onChange={(e) => setQuantidade(e.target.value)} 
-                  placeholder="Quantidade de itens"
+                  required
+                  value={quantidade}
+                  onChange={(e) => setQuantidade(e.target.value === "" ? "" : Number(e.target.value))}
                 />
               </div>
 
               <div className="form-group">
-                <label>Observação (Opcional):</label>
+                <label>Data:</label>
                 <input 
-                  type="text" 
-                  value={observacao} 
-                  onChange={(e) => setObservacao(e.target.value)} 
-                  placeholder="Ex: Nota fiscal Nº 1234 / Ajuste de inventário"
+                  type="date"
+                  required
+                  value={data}
+                  onChange={(e) => setData(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Observação:</label>
+                <textarea 
+                  rows={3}
+                  value={observacao}
+                  onChange={(e) => setObservacao(e.target.value)}
+                  placeholder="Ex: Motivo da saída/entrada..."
                 />
               </div>
 
               <button type="submit" className="btn-salvar" disabled={carregando}>
-                {carregando ? "Cadastrando..." : "Registrar Movimentação"}
+                {carregando ? "Registrando..." : "Registrar Movimentação"}
               </button>
             </form>
           </>
