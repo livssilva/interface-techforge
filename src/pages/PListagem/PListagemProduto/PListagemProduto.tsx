@@ -15,6 +15,7 @@ export function PListagemProduto() {
     setErro(false);
     try {
       const dados = await ProdutoRequests.listarTodos();
+      console.log("Dados recebidos da API /produtos:", dados); // Abra o F12 -> Console para inspecionar os nomes das chaves
       setProdutos(dados);
     } catch (error) {
       setErro(true);
@@ -30,6 +31,20 @@ export function PListagemProduto() {
   const formatarPreco = (val: any) => {
     const num = Number(val);
     return isNaN(num) ? "0.00" : num.toFixed(2);
+  };
+
+  // Tenta extrair o código do produto de qualquer propriedade comum usada no backend
+  const obterCodigoProduto = (prod: any) => {
+    if (!prod) return "-";
+    return (
+      prod.id ??
+      prod.codigo_produto ??
+      prod.codigo ??
+      prod.idProduto ??
+      prod.id_produto ??
+      prod._id ??
+      "-"
+    );
   };
 
   if (carregando) return <p className="mensagem-status">Carregando produtos...</p>;
@@ -61,15 +76,18 @@ export function PListagemProduto() {
             </tr>
           </thead>
           <tbody>
-            {produtos.map((prod: any, index) => (
-              <tr key={prod.id || prod.codigo_produto || index}>
-                <td>{prod.id ?? prod.codigo_produto ?? "-"}</td>
-                <td>{prod.nome}</td>
-                <td>{prod.categoriaId ?? prod.categoria ?? "-"}</td>
-                <td>{prod.quantidadeEstoque ?? prod.quantidade ?? 0}</td>
-                <td>R$ {formatarPreco(prod.preco ?? prod.preco_unitario)}</td>
-              </tr>
-            ))}
+            {produtos.map((prod: any, index) => {
+              const codigo = obterCodigoProduto(prod);
+              return (
+                <tr key={codigo !== "-" ? codigo : index}>
+                  <td>{codigo}</td>
+                  <td>{prod.nome ?? "-"}</td>
+                  <td>{prod.categoriaId ?? prod.categoria ?? "-"}</td>
+                  <td>{prod.quantidadeEstoque ?? prod.quantidade ?? 0}</td>
+                  <td>R$ {formatarPreco(prod.preco ?? prod.preco_unitario)}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}
