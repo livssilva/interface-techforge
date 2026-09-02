@@ -18,9 +18,18 @@
 body {
   margin: 0;
   padding: 0;
+  /* Cor de fundo base como fallback + Camada escura (75% opacidade) sobre o GIF */
   background-color: var(--bg-main);
+  background-image: 
+    linear-gradient(rgba(10, 14, 23, 0.75), rgba(10, 14, 23, 0.75)), 
+    url('/src/assets/gif-techforge.gif');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: Arial, sans-serif;
+  min-height: 100vh;
 }
 
 /* Botões com estilo pílula arredondada */
