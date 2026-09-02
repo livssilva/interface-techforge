@@ -27,6 +27,11 @@ export function PListagemProduto() {
     carregarProdutos();
   }, []);
 
+  const formatarPreco = (val: any) => {
+    const num = Number(val);
+    return isNaN(num) ? "0.00" : num.toFixed(2);
+  };
+
   if (carregando) return <p className="mensagem-status">Carregando produtos...</p>;
   if (erro) return <p className="mensagem-erro">Erro ao conectar com o servidor na porta 3000.</p>;
 
@@ -51,16 +56,18 @@ export function PListagemProduto() {
               <th>Código</th>
               <th>Nome</th>
               <th>Categoria</th>
+              <th>Estoque</th>
               <th>Preço</th>
             </tr>
           </thead>
           <tbody>
-            {produtos.map((prod) => (
-              <tr key={prod.codigo_produto}>
-                <td>{prod.codigo_produto ?? "-"}</td>
+            {produtos.map((prod: any, index) => (
+              <tr key={prod.id || prod.codigo_produto || index}>
+                <td>{prod.id ?? prod.codigo_produto ?? "-"}</td>
                 <td>{prod.nome}</td>
-                <td>{prod.categoria}</td>
-                <td>R$ {Number(prod.preco_unitario).toFixed(2)}</td>
+                <td>{prod.categoriaId ?? prod.categoria ?? "-"}</td>
+                <td>{prod.quantidadeEstoque ?? prod.quantidade ?? 0}</td>
+                <td>R$ {formatarPreco(prod.preco ?? prod.preco_unitario)}</td>
               </tr>
             ))}
           </tbody>
