@@ -51,20 +51,17 @@ export function PListagemCategoria() {
             <tr>
               <th>ID Categoria</th>
               <th>Nome</th>
-              <th>Descrição</th>
             </tr>
           </thead>
           <tbody>
             {categorias.map((cat: any, index) => {
               const idCategoria = cat.id_categoria ?? cat.id ?? cat.idCategoria ?? "-";
               const nome = cat.nome ?? cat.nomeCategoria ?? "-";
-              const descricao = cat.descricao ?? cat.descricao_categoria ?? "-";
 
               return (
                 <tr key={idCategoria !== "-" ? idCategoria : index}>
                   <td>{idCategoria}</td>
                   <td>{nome}</td>
-                  <td>{descricao}</td>
                 </tr>
               );
             })}
