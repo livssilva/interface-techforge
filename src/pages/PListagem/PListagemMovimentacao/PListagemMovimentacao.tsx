@@ -15,6 +15,7 @@ export function PListagemMovimentacao() {
     setErro(false);
     try {
       const dados = await MovimentacaoRequests.listarTodas();
+      console.log("Dados recebidos da API /movimentacoes:", dados);
       setMovimentacoes(dados);
     } catch (error) {
       setErro(true);
@@ -26,6 +27,17 @@ export function PListagemMovimentacao() {
   useEffect(() => {
     carregarMovimentacoes();
   }, []);
+
+  const formatarData = (dataRaw: any) => {
+    if (!dataRaw) return "-";
+    const data = new Date(dataRaw);
+    return isNaN(data.getTime()) ? "-" : data.toLocaleDateString("pt-BR");
+  };
+
+  const formatarPreco = (val: any) => {
+    const num = Number(val);
+    return isNaN(num) ? "0.00" : num.toFixed(2);
+  };
 
   if (carregando) return <p className="mensagem-status">Carregando movimentações...</p>;
   if (erro) return <p className="mensagem-erro">Erro ao conectar com o servidor na porta 3000.</p>;
@@ -48,31 +60,38 @@ export function PListagemMovimentacao() {
         <table className="tabela-movimentacoes">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>ID Movimentação</th>
               <th>ID Produto</th>
               <th>Tipo</th>
-              <th>Qtd</th>
+              <th>Quantidade</th>
+              <th>Valor Total</th>
               <th>Data</th>
-              <th>Observação</th>
             </tr>
           </thead>
           <tbody>
-            {movimentacoes.map((mov) => (
-              <tr key={mov.id_movimentacao}>
-                <td>{mov.id_movimentacao ?? "-"}</td>
-                <td>{mov.id_produto}</td>
-                <td>
-                  <span className={mov.tipo === 'ENTRADA' ? 'badge-entrada' : 'badge-saida'}>
-                    {mov.tipo}
-                  </span>
-                </td>
-                <td>{mov.quantidade}</td>
-                <td>
-                  {mov.data_movimentacao ? new Date(mov.data_movimentacao).toLocaleDateString('pt-BR') : "-"}
-                </td>
-                <td>{mov.observacao ?? "-"}</td>
-              </tr>
-            ))}
+            {movimentacoes.map((mov: any, index) => {
+              const idMov = mov.id_movimentacao ?? mov.id ?? mov.idMovimentacao ?? "-";
+              const idProd = mov.id_produto ?? mov.produtoId ?? mov.produto_id ?? "-";
+              const tipo = (mov.tipo ?? "ENTRADA").toUpperCase();
+              const quantidade = mov.quantidade ?? mov.qtd ?? 0;
+              const valorTotal = formatarPreco(mov.valor_total ?? mov.valorTotal ?? mov.preco_total ?? 0);
+              const data = formatarData(mov.data_movimentacao ?? mov.data);
+
+              return (
+                <tr key={idMov !== "-" ? idMov : index}>
+                  <td>{idMov}</td>
+                  <td>{idProd}</td>
+                  <td>
+                    <span className={tipo === 'ENTRADA' ? 'badge-entrada' : 'badge-saida'}>
+                      {tipo}
+                    </span>
+                  </td>
+                  <td>{quantidade}</td>
+                  <td>R$ {valorTotal}</td>
+                  <td>{data}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}
