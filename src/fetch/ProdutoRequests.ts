@@ -1,6 +1,6 @@
 import type { ProdutoDTO } from "../dto/ProdutoDTO";
 
-const API_URL = 'http://localhost:3000/produtos';
+const API_URL = 'http://localhost:3000/produto';
 
 export class ProdutoRequests {
   static async listarTodos(): Promise<ProdutoDTO[]> {
