@@ -1,0 +1,80 @@
+.container-listagem {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 24px;
+  background-color: #1e293b;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  color: #f8fafc;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.header-listagem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 12px;
+}
+
+.header-listagem h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #f8fafc;
+}
+
+.tabela-movimentacoes {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.tabela-movimentacoes th {
+  background-color: #0f172a;
+  color: #94a3b8;
+  padding: 12px 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+.tabela-movimentacoes td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #334155;
+  color: #e2e8f0;
+}
+
+.tabela-movimentacoes tbody tr:hover {
+  background-color: #334155;
+}
+
+.badge-entrada {
+  color: #34d399;
+  font-weight: bold;
+  background-color: rgba(52, 211, 153, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.badge-saida {
+  color: #f87171;
+  font-weight: bold;
+  background-color: rgba(248, 113, 113, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.mensagem-status {
+  text-align: center;
+  padding: 30px;
+  color: #94a3b8;
+  font-size: 1.1rem;
+}
+
+.mensagem-erro {
+  color: #f87171;
+  text-align: center;
+  padding: 20px;
+}
