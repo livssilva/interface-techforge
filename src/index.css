@@ -20,7 +20,7 @@ body {
   padding: 0;
   background-color: var(--bg-main);
   color: var(--text-primary);
-  font-family: 'Poppins', sans-serif;
+  font-family: Arial, sans-serif;
 }
 
 /* Botões com estilo pílula arredondada */
@@ -34,6 +34,7 @@ button {
   padding: 12px 24px;
   font-size: 0.95rem;
   transition: all 0.2s ease;
+  font-family: Arial, sans-serif;
 }
 
 button:hover {
@@ -49,7 +50,7 @@ input, select, textarea {
   color: var(--text-primary);
   padding: 12px 16px;
   border-radius: 8px;
-  font-family: 'Poppins', sans-serif;
+  font-family: Arial, sans-serif;
   outline: none;
   transition: all 0.2s ease;
 }
