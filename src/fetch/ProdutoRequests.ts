@@ -1,11 +1,12 @@
 import type { ProdutoDTO } from "../dto/ProdutoDTO";
 
-const API_URL = 'http://localhost:3000/produto';
+const BASE_URL = 'http://localhost:3000';
 
 export class ProdutoRequests {
+  // GET usa o PLURAL: /produtos
   static async listarTodos(): Promise<ProdutoDTO[]> {
     try {
-      const response = await fetch(API_URL);
+      const response = await fetch(`${BASE_URL}/produtos`);
       if (!response.ok) throw new Error('Erro ao buscar produtos.');
       
       const dados = await response.json();
@@ -16,9 +17,10 @@ export class ProdutoRequests {
     }
   }
 
+  // POST usa o SINGULAR: /produto
   static async cadastrar(produto: Partial<ProdutoDTO>): Promise<boolean> {
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(`${BASE_URL}/produto`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(produto)
