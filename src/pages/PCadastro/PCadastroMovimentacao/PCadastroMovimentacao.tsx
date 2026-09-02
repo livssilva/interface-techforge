@@ -1,11 +1,13 @@
-import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { MovimentacaoRequests } from "../../../fetch/MovimentacaoRequests";
-import "./PCadastroMovimentacao.css";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { MovimentacaoRequests } from '../../../fetch/MovimentacaoRequests';
+import './PCadastroMovimentacao.css';
 
-const OPCOES_TIPO = [
-  "Entrada",
-  "Saída"
+type TipoMovimentacao = "ENTRADA" | "SAIDA";
+
+const OPCOES_TIPO: { label: string; value: TipoMovimentacao }[] = [
+  { label: "Entrada", value: "ENTRADA" },
+  { label: "Saída", value: "SAIDA" }
 ];
 
 const OPCOES_PRODUTOS = [
@@ -17,143 +19,161 @@ const OPCOES_PRODUTOS = [
   "Cadeira Gamer Ergonomica"
 ];
 
+interface FormState {
+  produtoId: string;
+  tipo: TipoMovimentacao | '';
+  quantidade: number;
+  data: string;
+  observacao: string;
+}
+
 export function PCadastroMovimentacao() {
   const navigate = useNavigate();
-  const [produtoId, setProdutoId] = useState("");
-  const [tipo, setTipo] = useState("");
-  const [quantidade, setQuantidade] = useState<number | "">(1);
-  const [data, setData] = useState(new Date().toISOString().split('T')[0]);
-  const [observacao, setObservacao] = useState("");
-  
-  const [cadastradoComSucesso, setCadastradoComSucesso] = useState(false);
-  const [carregando, setCarregando] = useState(false);
+  const [formData, setFormData] = useState<FormState>({
+    produtoId: '',
+    tipo: '',
+    quantidade: 1,
+    data: new Date().toISOString().split('T')[0],
+    observacao: ''
+  });
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'quantidade' ? Number(value) : value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!produtoId || !tipo || !quantidade || Number(quantidade) <= 0) {
-      alert("Por favor, preencha todos os campos obrigatórios corretamente.");
+    if (!formData.tipo) {
+      alert("Selecione o tipo de movimentação.");
       return;
     }
 
-    setCarregando(true);
+    if (formData.quantidade <= 0) {
+      alert("Informe uma quantidade válida maior que zero.");
+      return;
+    }
 
-    const novaMovimentacao: any = {
-      produtoId,
-      tipo,
-      quantidade: Number(quantidade),
-      data,
-      observacao
+    // Criamos o objeto pronto no formato exato esperado pela API
+    const payload = {
+      produtoId: formData.produtoId,
+      tipo: formData.tipo as TipoMovimentacao,
+      quantidade: formData.quantidade,
+      data: formData.data,
+      observacao: formData.observacao
     };
 
-    const sucesso = await MovimentacaoRequests.cadastrar(novaMovimentacao);
-
-    setCarregando(false);
+    const sucesso = await MovimentacaoRequests.cadastrar(payload);
 
     if (sucesso) {
-      setCadastradoComSucesso(true);
+      alert("Movimentação registrada com sucesso!");
+      navigate('/movimentacoes');
     } else {
-      alert("Erro ao registrar movimentação. Tente novamente.");
+      alert("Erro ao registrar movimentação. Verifique os dados e a conexão com a API.");
     }
   };
 
   return (
-    <main className="cadastro-container">
-      <div className="cadastro-card">
-        {cadastradoComSucesso ? (
-          <div style={{ textAlign: "center", padding: "20px 0" }}>
-            <h2 style={{ color: "#34d399", marginBottom: "12px" }}>
-              ✓ Movimentação Registrada com Sucesso!
-            </h2>
-            <p style={{ color: "#94a3b8", marginBottom: "24px" }}>
-              A movimentação foi adicionada ao seu banco de dados.
-            </p>
-            
-            <button 
-              onClick={() => navigate("/movimentacoes")} 
-              className="btn-salvar"
-              style={{ width: "100%", cursor: "pointer" }}
-            >
-              ← Voltar para a Listagem de Movimentações
-            </button>
-          </div>
-        ) : (
-          <>
-            <Link to="/movimentacoes" style={{ color: "#38bdf8", textDecoration: "none" }}>
-              ← Voltar para Listagem
-            </Link>
-            <h2 style={{ margin: "16px 0" }}>Registrar Movimentação</h2>
+    <main className="form-main-container">
+      <div className="form-wrapper">
+        <form onSubmit={handleSubmit} className="form-card">
+          <h1 className="form-title">Registrar Movimentação</h1>
 
-            <form onSubmit={handleSubmit} className="cadastro-form">
-              <div className="form-group">
-                <label>Selecione o Produto:</label>
-                <select 
-                  required 
-                  value={produtoId} 
-                  onChange={(e) => setProdutoId(e.target.value)}
-                >
-                  <option value="">-- Escolha um produto --</option>
-                  {OPCOES_PRODUTOS.map((item, index) => (
-                    <option key={index} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </div>
+          <div className="form-grid">
+            <div className="form-group full-width">
+              <label htmlFor="produtoId">Produto</label>
+              <select
+                name="produtoId"
+                id="produtoId"
+                required
+                value={formData.produtoId}
+                onChange={handleChange}
+              >
+                <option value="">-- Escolha um produto --</option>
+                {OPCOES_PRODUTOS.map((item, index) => (
+                  <option key={index} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </div>
 
+            <div className="form-row">
               <div className="form-group">
-                <label>Tipo de Movimentação:</label>
-                <select 
-                  required 
-                  value={tipo} 
-                  onChange={(e) => setTipo(e.target.value)}
+                <label htmlFor="tipo">Tipo de Movimentação</label>
+                <select
+                  name="tipo"
+                  id="tipo"
+                  required
+                  value={formData.tipo}
+                  onChange={handleChange}
                 >
                   <option value="">-- Escolha o tipo --</option>
                   {OPCOES_TIPO.map((item, index) => (
-                    <option key={index} value={item}>
-                      {item}
+                    <option key={index} value={item.value}>
+                      {item.label}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div className="form-group">
-                <label>Quantidade:</label>
-                <input 
+                <label htmlFor="quantidade">Quantidade</label>
+                <input
                   type="number"
+                  name="quantidade"
+                  id="quantidade"
                   min="1"
                   required
-                  value={quantidade}
-                  onChange={(e) => setQuantidade(e.target.value === "" ? "" : Number(e.target.value))}
+                  value={formData.quantidade || ''}
+                  onChange={handleChange}
+                  placeholder="1"
                 />
               </div>
+            </div>
 
-              <div className="form-group">
-                <label>Data:</label>
-                <input 
-                  type="date"
-                  required
-                  value={data}
-                  onChange={(e) => setData(e.target.value)}
-                />
-              </div>
+            <div className="form-group full-width">
+              <label htmlFor="data">Data</label>
+              <input
+                type="date"
+                name="data"
+                id="data"
+                required
+                value={formData.data}
+                onChange={handleChange}
+              />
+            </div>
 
-              <div className="form-group">
-                <label>Observação:</label>
-                <textarea 
-                  rows={3}
-                  value={observacao}
-                  onChange={(e) => setObservacao(e.target.value)}
-                  placeholder="Ex: Motivo da saída/entrada..."
-                />
-              </div>
+            <div className="form-group full-width">
+              <label htmlFor="observacao">Observação</label>
+              <textarea
+                name="observacao"
+                id="observacao"
+                rows={3}
+                value={formData.observacao}
+                onChange={handleChange}
+                placeholder="Motivo da saída/entrada..."
+              />
+            </div>
+          </div>
 
-              <button type="submit" className="btn-salvar" disabled={carregando}>
-                {carregando ? "Registrando..." : "Registrar Movimentação"}
-              </button>
-            </form>
-          </>
-        )}
+          <div className="form-actions">
+            <button type="submit" className="btn-submit">
+              REGISTRAR MOVIMENTAÇÃO
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/movimentacoes')}
+              className="btn-cancel"
+            >
+              VOLTAR PARA LISTAGEM
+            </button>
+          </div>
+        </form>
       </div>
     </main>
   );
