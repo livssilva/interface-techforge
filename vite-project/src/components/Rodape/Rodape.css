@@ -1,0 +1,38 @@
+.footer-container {
+  width: 100%;
+  background-color: #0f172a;
+  border-top: 1px solid #334155;
+  padding: 20px 0;
+  margin-top: auto;
+  color: #94a3b8;
+  font-family: system-ui, -apple-system, sans-serif;
+  text-align: center;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-title {
+  color: #38bdf8;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+}
+
+.footer-text {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.footer-copy {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 4px;
+}
