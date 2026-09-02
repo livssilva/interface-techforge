@@ -1,145 +1,147 @@
-// src/pages/PCadastro/PCadastroProduto/PCadastroProduto.tsx
-import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ProdutoRequests } from "../../../fetch/ProdutoRequests";
-import "./PCadastroProduto.css";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ProdutoRequests } from '../../../fetch/ProdutoRequests';
+import './PCadastroProduto.css';
 
-const OPCOES_PRODUTOS = [
-  "Teclado Mecânico",
-  "Mouse Gamer",
-  "Monitor 24\"",
-  "Headset Stereo",
-  "Gabinete ATX",
-  "Placa de Vídeo",
-  "Memória RAM 16GB",
-  "SSD 1TB"
-];
-
-const OPCOES_CATEGORIAS = [
-  "Periféricos",
-  "Hardware",
-  "Monitores",
-  "Armazenamento",
-  "Acessórios"
-];
+interface ProdutoDTO {
+  nome: string;
+  descricao: string;
+  preco: number;
+  quantidadeEstoque: number;
+  categoriaId: string;
+}
 
 export function PCadastroProduto() {
   const navigate = useNavigate();
-  const [nome, setNome] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [precoUnitario, setPrecoUnitario] = useState("");
-  
-  // Estado para controlar o sucesso do cadastro
-  const [cadastradoComSucesso, setCadastradoComSucesso] = useState(false);
-  const [carregando, setCarregando] = useState(false);
+  const [formData, setFormData] = useState<ProdutoDTO>({
+    nome: '',
+    descricao: '',
+    preco: 0,
+    quantidadeEstoque: 0,
+    categoriaId: ''
+  });
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'preco' || name === 'quantidadeEstoque' ? Number(value) : value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!nome || !categoria) {
-      alert("Por favor, selecione o produto e a categoria.");
+    if (formData.preco <= 0) {
+      alert("Informe um preço válido maior que zero.");
       return;
     }
 
-    setCarregando(true);
-
-    const novoProduto: any = {
-      nome,
-      categoria,
-      preco_unitario: Number(precoUnitario)
-    };
-
-    const sucesso = await ProdutoRequests.cadastrar(novoProduto);
-
-    setCarregando(false);
-
+    // Chamada do método estático ProdutoRequests.cadastrar
+    const sucesso = await ProdutoRequests.cadastrar(formData);
+    
     if (sucesso) {
-      setCadastradoComSucesso(true);
+      alert("Produto cadastrado com sucesso!");
+      navigate('/produtos');
     } else {
-      alert("Erro ao cadastrar produto. Tente novamente.");
+      alert("Erro ao cadastrar produto. Verifique os dados e a conexão com a API.");
     }
   };
 
   return (
-    <main className="cadastro-container">
-      <div className="cadastro-card">
-        {cadastradoComSucesso ? (
-          /* Tela exibida APÓS o cadastro com sucesso */
-          <div style={{ textAlign: "center", padding: "20px 0" }}>
-            <h2 style={{ color: "#34d399", marginBottom: "12px" }}>
-              ✓ Produto Cadastrado com Sucesso!
-            </h2>
-            <p style={{ color: "#94a3b8", marginBottom: "24px" }}>
-              O item foi adicionado ao seu banco de dados.
-            </p>
-            
-            <button 
-              onClick={() => navigate("/produtos")} 
-              className="btn-salvar"
-              style={{ width: "100%", cursor: "pointer" }}
-            >
-              ← Voltar para a Listagem de Produtos
-            </button>
-          </div>
-        ) : (
-          /* Formulário de Cadastro */
-          <>
-            <Link to="/produtos" style={{ color: "#38bdf8", textDecoration: "none" }}>
-              ← Voltar para Listagem
-            </Link>
-            <h2 style={{ margin: "16px 0" }}>Cadastrar Novo Produto</h2>
+    <main className="form-main-container">
+      <div className="form-wrapper">
+        <form onSubmit={handleSubmit} className="form-card">
+          <h1 className="form-title">Cadastro de Produto</h1>
 
-            <form onSubmit={handleSubmit} className="cadastro-form">
-              <div className="form-group">
-                <label>Selecione o Produto:</label>
-                <select 
-                  required 
-                  value={nome} 
-                  onChange={(e) => setNome(e.target.value)}
-                >
-                  <option value="">-- Escolha um produto --</option>
-                  {OPCOES_PRODUTOS.map((item, index) => (
-                    <option key={index} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </div>
+          <div className="form-grid">
+            <div className="form-group full-width">
+              <label htmlFor="nome">Nome do Produto</label>
+              <input
+                type="text"
+                name="nome"
+                id="nome"
+                required
+                minLength={3}
+                value={formData.nome}
+                onChange={handleChange}
+                placeholder="Ex: Teclado Mecânico RGB"
+              />
+            </div>
 
+            <div className="form-row">
               <div className="form-group">
-                <label>Selecione a Categoria:</label>
-                <select 
-                  required 
-                  value={categoria} 
-                  onChange={(e) => setCategoria(e.target.value)}
-                >
-                  <option value="">-- Escolha uma categoria --</option>
-                  {OPCOES_CATEGORIAS.map((cat, index) => (
-                    <option key={index} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Preço Unitário (R$):</label>
-                <input 
-                  type="number" 
-                  step="0.01" 
-                  required 
-                  value={precoUnitario} 
-                  onChange={(e) => setPrecoUnitario(e.target.value)} 
-                  placeholder="0.00"
+                <label htmlFor="preco">Preço (R$)</label>
+                <input
+                  type="number"
+                  name="preco"
+                  id="preco"
+                  step="0.01"
+                  min="0"
+                  required
+                  value={formData.preco || ''}
+                  onChange={handleChange}
+                  placeholder="0,00"
                 />
               </div>
 
-              <button type="submit" className="btn-salvar" disabled={carregando}>
-                {carregando ? "Cadastrando..." : "Cadastrar Produto"}
-              </button>
-            </form>
-          </>
-        )}
+              <div className="form-group">
+                <label htmlFor="quantidadeEstoque">Quantidade Inicial</label>
+                <input
+                  type="number"
+                  name="quantidadeEstoque"
+                  id="quantidadeEstoque"
+                  min="0"
+                  required
+                  value={formData.quantidadeEstoque || ''}
+                  onChange={handleChange}
+                  placeholder="0"
+                />
+              </div>
+            </div>
+
+            <div className="form-group full-width">
+              <label htmlFor="categoriaId">Categoria</label>
+              <select
+                name="categoriaId"
+                id="categoriaId"
+                required
+                value={formData.categoriaId}
+                onChange={handleChange}
+              >
+                <option value="">Selecione uma categoria</option>
+                <option value="1">Periféricos</option>
+                <option value="2">Hardware</option>
+                <option value="3">Monitores</option>
+              </select>
+            </div>
+
+            <div className="form-group full-width">
+              <label htmlFor="descricao">Descrição</label>
+              <textarea
+                name="descricao"
+                id="descricao"
+                rows={3}
+                value={formData.descricao}
+                onChange={handleChange}
+                placeholder="Detalhes do produto..."
+              />
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button type="submit" className="btn-submit">
+              CADASTRAR PRODUTO
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/produtos')}
+              className="btn-cancel"
+            >
+              VOLTAR PARA LISTAGEM
+            </button>
+          </div>
+        </form>
       </div>
     </main>
   );
