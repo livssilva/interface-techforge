@@ -3,6 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { ProdutoRequests } from '../../../fetch/ProdutoRequests';
 import './PCadastroProduto.css';
 
+const OPCOES_CATEGORIAS = [
+  "Periféricos",
+  "Hardware",
+  "Monitores",
+  "Armazenamento",
+  "Acessórios",
+  "Redes",
+  "Cadeiras Gamer",
+  "Áudio"
+];
+
 interface ProdutoDTO {
   nome: string;
   descricao: string;
@@ -37,7 +48,6 @@ export function PCadastroProduto() {
       return;
     }
 
-    // Chamada do método estático ProdutoRequests.cadastrar
     const sucesso = await ProdutoRequests.cadastrar(formData);
     
     if (sucesso) {
@@ -109,10 +119,12 @@ export function PCadastroProduto() {
                 value={formData.categoriaId}
                 onChange={handleChange}
               >
-                <option value="">Selecione uma categoria</option>
-                <option value="1">Periféricos</option>
-                <option value="2">Hardware</option>
-                <option value="3">Monitores</option>
+                <option value="">-- Escolha uma categoria --</option>
+                {OPCOES_CATEGORIAS.map((item, index) => (
+                  <option key={index} value={item}>
+                    {item}
+                  </option>
+                ))}
               </select>
             </div>
 
