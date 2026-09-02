@@ -1,50 +1,68 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ProdutoRequests } from '../../../fetch/ProdutoRequests';
+import { CategoriaRequests } from '../../../fetch/CategoriaRequests'; // Importante para buscar as categorias reais
+import type CategoriaDTO from '../../../dto/CategoriaDTO';
 import './PCadastroProduto.css';
 
-const OPCOES_CATEGORIAS = [
-  "Periféricos",
-  "Hardware",
-  "Monitores",
-  "Armazenamento",
-  "Acessórios",
-  "Redes",
-  "Cadeiras Gamer",
-  "Áudio"
-];
-
-interface ProdutoDTO {
+interface FormProduto {
+  codigo: string;
   nome: string;
   descricao: string;
-  preco: number;
-  quantidadeEstoque: number;
-  categoriaId: string;
+  preco_unitario: number;
+  quantidade_disponivel: number;
+  id_categoria: number | string;
 }
 
 export function PCadastroProduto() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<ProdutoDTO>({
+  const [categorias, setCategorias] = useState<CategoriaDTO[]>([]);
+  const [formData, setFormData] = useState<FormProduto>({
+    codigo: '',
     nome: '',
     descricao: '',
-    preco: 0,
-    quantidadeEstoque: 0,
-    categoriaId: ''
+    preco_unitario: 0,
+    quantidade_disponivel: 0,
+    id_categoria: ''
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  // Busca as categorias cadastradas na API ao carregar o componente
+  useEffect(() => {
+    async function carregarCategorias() {
+      try {
+        const dados = await CategoriaRequests.listarTodas();
+        setCategorias(dados);
+      } catch (error) {
+        console.error('Erro ao carregar categorias:', error);
+      }
+    }
+    carregarCategorias();
+  }, []);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'preco' || name === 'quantidadeEstoque' ? Number(value) : value
+      [name]: name === 'preco_unitario' || name === 'quantidade_disponivel' 
+        ? Number(value) 
+        : name === 'id_categoria' 
+          ? Number(value) || '' 
+          : value
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (formData.preco <= 0) {
+    if (formData.preco_unitario <= 0) {
       alert("Informe um preço válido maior que zero.");
+      return;
+    }
+
+    if (!formData.id_categoria) {
+      alert("Selecione uma categoria válida.");
       return;
     }
 
@@ -66,6 +84,19 @@ export function PCadastroProduto() {
 
           <div className="form-grid">
             <div className="form-group full-width">
+              <label htmlFor="codigo">Código do Produto</label>
+              <input
+                type="text"
+                name="codigo"
+                id="codigo"
+                required
+                value={formData.codigo}
+                onChange={handleChange}
+                placeholder="Ex: PROD-001"
+              />
+            </div>
+
+            <div className="form-group full-width">
               <label htmlFor="nome">Nome do Produto</label>
               <input
                 type="text"
@@ -81,29 +112,29 @@ export function PCadastroProduto() {
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="preco">Preço (R$)</label>
+                <label htmlFor="preco_unitario">Preço (R$)</label>
                 <input
                   type="number"
-                  name="preco"
-                  id="preco"
+                  name="preco_unitario"
+                  id="preco_unitario"
                   step="0.01"
                   min="0"
                   required
-                  value={formData.preco || ''}
+                  value={formData.preco_unitario || ''}
                   onChange={handleChange}
                   placeholder="0,00"
                 />
               </div>
 
               <div className="form-group">
-                <label htmlFor="quantidadeEstoque">Quantidade Inicial</label>
+                <label htmlFor="quantidade_disponivel">Quantidade Inicial</label>
                 <input
                   type="number"
-                  name="quantidadeEstoque"
-                  id="quantidadeEstoque"
+                  name="quantidade_disponivel"
+                  id="quantidade_disponivel"
                   min="0"
                   required
-                  value={formData.quantidadeEstoque || ''}
+                  value={formData.quantidade_disponivel || ''}
                   onChange={handleChange}
                   placeholder="0"
                 />
@@ -111,18 +142,18 @@ export function PCadastroProduto() {
             </div>
 
             <div className="form-group full-width">
-              <label htmlFor="categoriaId">Categoria</label>
+              <label htmlFor="id_categoria">Categoria</label>
               <select
-                name="categoriaId"
-                id="categoriaId"
+                name="id_categoria"
+                id="id_categoria"
                 required
-                value={formData.categoriaId}
+                value={formData.id_categoria}
                 onChange={handleChange}
               >
                 <option value="">-- Escolha uma categoria --</option>
-                {OPCOES_CATEGORIAS.map((item, index) => (
-                  <option key={index} value={item}>
-                    {item}
+                {categorias.map((cat) => (
+                  <option key={cat.id_categoria} value={cat.id_categoria}>
+                    {cat.nome}
                   </option>
                 ))}
               </select>
