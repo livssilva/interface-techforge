@@ -1,0 +1,61 @@
+.home-container {
+  background-color: #0f172a;
+  color: #f8fafc;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: sans-serif;
+}
+
+.home-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.home-highlight {
+  color: #38bdf8;
+}
+
+.home-subtitle {
+  margin-bottom: 2rem;
+  color: #94a3b8;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.home-btn {
+  background-color: #06b6d4;
+  color: #020617;
+  font-weight: bold;
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.home-btn:hover {
+  background-color: #0891b2;
+}
+
+
+.home-container {
+  min-height: 100vh;
+  width: 100%;
+  
+  background-image: linear-gradient(
+      rgba(15, 23, 42, 0.88), 
+      rgba(15, 23, 42, 0.88)
+    ),
+    url('/src/assets/fundo-techforge.webp'); 
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: #f8fafc;
+}
