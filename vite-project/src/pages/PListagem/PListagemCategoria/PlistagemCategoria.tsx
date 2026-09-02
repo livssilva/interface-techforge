@@ -1,0 +1,69 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { CategoriaRequests } from "../../../fetch/CategoriaRequests";
+import type CategoriaDTO from "../../../dto/CategoriaDTO";
+import "./PListagemCategoria.css";
+
+export function PListagemCategoria() {
+  const [categorias, setCategorias] = useState<CategoriaDTO[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState(false);
+  const navigate = useNavigate();
+
+  const carregarCategorias = async () => {
+    setCarregando(true);
+    setErro(false);
+    try {
+      const dados = await CategoriaRequests.listarTodas();
+      setCategorias(dados);
+    } catch (error) {
+      setErro(true);
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  useEffect(() => {
+    carregarCategorias();
+  }, []);
+
+  if (carregando) return <p className="mensagem-status">Carregando categorias...</p>;
+  if (erro) return <p className="mensagem-erro">Erro ao conectar com o servidor na porta 3000.</p>;
+
+  return (
+    <div className="container-listagem">
+      <div className="header-listagem">
+        <h2>Lista de Categorias</h2>
+        <button 
+          className="btn-cadastrar" 
+          onClick={() => navigate("/cadastro/categoria")}
+        >
+          + Cadastrar Categoria
+        </button>
+      </div>
+
+      {categorias.length === 0 ? (
+        <p className="mensagem-status">Nenhuma categoria encontrada.</p>
+      ) : (
+        <table className="tabela-categorias">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+            </tr>
+          </thead>
+          <tbody>
+            {categorias.map((cat) => (
+              <tr key={cat.id_categoria}>
+                <td>{cat.id_categoria ?? "-"}</td>
+                <td>{cat.nome}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
+
+export default PListagemCategoria;
