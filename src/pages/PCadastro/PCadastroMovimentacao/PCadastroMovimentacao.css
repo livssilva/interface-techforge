@@ -1,0 +1,47 @@
+.container-cadastro {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 32px;
+  background-color: var(--bg-card);
+  border-radius: var(--radius-ui);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.header-cadastro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.form-cadastro {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.btn-voltar {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-ui);
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.btn-voltar:hover {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+}
