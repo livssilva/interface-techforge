@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MovimentacaoRequests } from "../../../fetch/MovimentacaoRequests";
-import "../PCadastroProduto/PCadastroProduto.css";
+import "./PCadastroMovimentacao.css";
 
 const OPCOES_TIPO = [
   "Entrada",
@@ -25,7 +25,6 @@ export function PCadastroMovimentacao() {
   const [data, setData] = useState(new Date().toISOString().split('T')[0]);
   const [observacao, setObservacao] = useState("");
   
-  // Estado para controlar o sucesso do cadastro
   const [cadastradoComSucesso, setCadastradoComSucesso] = useState(false);
   const [carregando, setCarregando] = useState(false);
 
@@ -62,7 +61,6 @@ export function PCadastroMovimentacao() {
     <main className="cadastro-container">
       <div className="cadastro-card">
         {cadastradoComSucesso ? (
-          /* Tela exibida APÓS o cadastro com sucesso */
           <div style={{ textAlign: "center", padding: "20px 0" }}>
             <h2 style={{ color: "#34d399", marginBottom: "12px" }}>
               ✓ Movimentação Registrada com Sucesso!
@@ -80,7 +78,6 @@ export function PCadastroMovimentacao() {
             </button>
           </div>
         ) : (
-          /* Formulário de Cadastro */
           <>
             <Link to="/movimentacoes" style={{ color: "#38bdf8", textDecoration: "none" }}>
               ← Voltar para Listagem
