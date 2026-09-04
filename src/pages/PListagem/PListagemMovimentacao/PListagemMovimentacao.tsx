@@ -39,6 +39,28 @@ export function PListagemMovimentacao() {
     return isNaN(num) ? "0.00" : num.toFixed(2);
   };
 
+  const handleEditar = (id: number | string) => {
+    navigate(`/cadastro/movimentacao?id=${id}`);
+  };
+
+  const handleDeletar = async (id: number | string) => {
+    if (!window.confirm("Tem certeza que deseja excluir esta movimentação?")) return;
+
+    try {
+      const sucesso = await MovimentacaoRequests.deletar(id);
+
+      if (sucesso) {
+        setMovimentacoes((prev) =>
+          prev.filter((m: any) => (m.id_movimentacao ?? m.id) !== id)
+        );
+      } else {
+        alert("Erro ao excluir a movimentação.");
+      }
+    } catch (err) {
+      alert("Erro ao conectar com o servidor para exclusão.");
+    }
+  };
+
   if (carregando) return <p className="mensagem-status">Carregando movimentações...</p>;
   if (erro) return <p className="mensagem-erro">Erro ao conectar com o servidor na porta 3000.</p>;
 
@@ -57,43 +79,62 @@ export function PListagemMovimentacao() {
       {movimentacoes.length === 0 ? (
         <p className="mensagem-status">Nenhuma movimentação registrada.</p>
       ) : (
-        <table className="tabela-movimentacoes">
-          <thead>
-            <tr>
-              <th>ID Movimentação</th>
-              <th>ID Produto</th>
-              <th>Tipo</th>
-              <th>Quantidade</th>
-              <th>Valor Total</th>
-              <th>Data</th>
-            </tr>
-          </thead>
-          <tbody>
-            {movimentacoes.map((mov: any, index) => {
-              const idMov = mov.id_movimentacao ?? mov.id ?? mov.idMovimentacao ?? "-";
-              const idProd = mov.id_produto ?? mov.produtoId ?? mov.produto_id ?? "-";
-              const tipo = (mov.tipo ?? "ENTRADA").toUpperCase();
-              const quantidade = mov.quantidade ?? mov.qtd ?? 0;
-              const valorTotal = formatarPreco(mov.valor_total ?? mov.valorTotal ?? mov.preco_total ?? 0);
-              const data = formatarData(mov.data_movimentacao ?? mov.data);
+        <div className="tabela-responsive">
+          <table className="tabela-movimentacoes">
+            <thead>
+              <tr>
+                <th>ID MOVIMENTAÇÃO</th>
+                <th>ID PRODUTO</th>
+                <th>TIPO</th>
+                <th>QUANTIDADE</th>
+                <th>VALOR TOTAL</th>
+                <th>DATA</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {movimentacoes.map((mov: any, index) => {
+                const idMov = mov.id_movimentacao ?? mov.id ?? mov.idMovimentacao ?? "-";
+                const idProd = mov.id_produto ?? mov.produtoId ?? mov.produto_id ?? "-";
+                const tipo = (mov.tipo ?? "ENTRADA").toUpperCase();
+                const quantidade = mov.quantidade ?? mov.qtd ?? 0;
+                const valorTotal = formatarPreco(mov.valor_total ?? mov.valorTotal ?? mov.preco_total ?? 0);
+                const data = formatarData(mov.data_movimentacao ?? mov.data);
 
-              return (
-                <tr key={idMov !== "-" ? idMov : index}>
-                  <td>{idMov}</td>
-                  <td>{idProd}</td>
-                  <td>
-                    <span className={tipo === 'ENTRADA' ? 'badge-entrada' : 'badge-saida'}>
-                      {tipo}
-                    </span>
-                  </td>
-                  <td>{quantidade}</td>
-                  <td>R$ {valorTotal}</td>
-                  <td>{data}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                return (
+                  <tr key={idMov !== "-" ? idMov : index}>
+                    <td>{idMov}</td>
+                    <td>{idProd}</td>
+                    <td>
+                      <span className={tipo === 'ENTRADA' ? 'badge-entrada' : 'badge-saida'}>
+                        {tipo}
+                      </span>
+                    </td>
+                    <td>{quantidade}</td>
+                    <td>R$ {valorTotal}</td>
+                    <td>{data}</td>
+                    <td>
+                      <div className="coluna-acoes">
+                        <button 
+                          className="btn-acao btn-atualizar"
+                          onClick={() => handleEditar(idMov)}
+                        >
+                          Atualizar
+                        </button>
+                        <button 
+                          className="btn-acao btn-deletar"
+                          onClick={() => handleDeletar(idMov)}
+                        >
+                          Deletar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
