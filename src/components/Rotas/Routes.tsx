@@ -1,22 +1,36 @@
-import { Routes, Route } from "react-router-dom";
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "../../Middleware/AuthMiddleware";
+import { PWelcome } from "../../pages/PWelcome/PWelcome";
 import PHome from "../../pages/PHome/PHome";
 import PListagemProduto from "../../pages/PListagem/PListagemProduto/PListagemProduto";
 import PCadastroProduto from "../../pages/PCadastro/PCadastroProduto/PCadastroProduto";
-import PListagemCategoria from "../../pages/PListagem/PListagemCategoria/PlistagemCategoria";
+import PListagemCategoria from "../../pages/PListagem/PListagemCategoria/PListagemCategoria";
 import PCadastroCategoria from "../../pages/PCadastro/PCadastroCategoria/PCadastroCategoria";
 import PListagemMovimentacao from "../../pages/PListagem/PListagemMovimentacao/PListagemMovimentacao";
 import PCadastroMovimentacao from "../../pages/PCadastro/PCadastroMovimentacao/PCadastroMovimentacao";
 
+// Usando React.ReactElement para evitar qualquer dependência do namespace global JSX
+function RotaProtegida({ children }: { children: React.ReactElement }) {
+  const { autenticado, loading } = useAuth();
+
+  if (loading) return null;
+  
+  return autenticado ? children : <Navigate to="/" replace />;
+}
+
 export function Rotas() {
   return (
     <Routes>
-      <Route path="/" element={<PHome />} />
-      <Route path="/produtos" element={<PListagemProduto />} />
-      <Route path="/cadastro/produto" element={<PCadastroProduto />} /> {/* Rota de Cadastro */}
-      <Route path="/categorias" element={<PListagemCategoria />} />
-      <Route path="/movimentacoes" element={<PListagemMovimentacao />} />
-      <Route path="/cadastro/movimentacao" element={<PCadastroMovimentacao />} />
-      <Route path="/cadastro/categoria" element={<PCadastroCategoria />} /> {/* Rota de Cadastro */}
+      <Route path="/" element={<PWelcome />} />
+      <Route path="/home" element={<RotaProtegida><PHome /></RotaProtegida>}/>
+      <Route path="/produtos" element={<RotaProtegida><PListagemProduto /></RotaProtegida>}/>
+      <Route path="/cadastro/produto" element={<RotaProtegida><PCadastroProduto /></RotaProtegida>}/>
+      <Route path="/categorias" element={<RotaProtegida><PListagemCategoria /></RotaProtegida>}/>
+      <Route path="/cadastro/categoria" element={<RotaProtegida><PCadastroCategoria /></RotaProtegida>}/>
+      <Route path="/movimentacoes"element={<RotaProtegida><PListagemMovimentacao /></RotaProtegida>}/>
+      <Route path="/cadastro/movimentacao" element={<RotaProtegida><PCadastroMovimentacao /></RotaProtegida>} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
