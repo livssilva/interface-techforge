@@ -1,5 +1,6 @@
 // src/pages/PListagem/PListagemCategoria/PListagemCategoria.tsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { CategoriaRequests } from "../../../fetch/CategoriaRequests";
 import type CategoriaDTO from "../../../dto/CategoriaDTO";
 import "./PListagemCategoria.css";
@@ -8,6 +9,7 @@ export function PListagemCategoria() {
   const [categorias, setCategorias] = useState<CategoriaDTO[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(false);
+  const navigate = useNavigate();
 
   // Estados do Modal de Edição
   const [categoriaEditando, setCategoriaEditando] = useState<CategoriaDTO | null>(null);
@@ -31,7 +33,6 @@ export function PListagemCategoria() {
     carregarCategorias();
   }, []);
 
-  // Abrir o modal preenchido com os dados reais do DTO
   const handleAbrirEditar = (cat: CategoriaDTO) => {
     setCategoriaEditando(cat);
     setNomeEdit(cat.nome || "");
@@ -42,7 +43,6 @@ export function PListagemCategoria() {
     setNomeEdit("");
   };
 
-  // Salvar as alterações via API
   const handleSalvarAtualizacao = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!categoriaEditando || !categoriaEditando.id_categoria) return;
@@ -97,6 +97,12 @@ export function PListagemCategoria() {
     <div className="container-listagem">
       <div className="header-listagem">
         <h2>Listagem de Categorias</h2>
+        <button 
+          className="btn-cadastrar" 
+          onClick={() => navigate("/cadastro/categoria")}
+        >
+          + Cadastrar Categoria
+        </button>
       </div>
 
       {categorias.length === 0 ? (
