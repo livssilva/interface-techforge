@@ -1,7 +1,8 @@
+// src/pages/PListagem/PListagemProduto/PListagemProduto.tsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ProdutoRequests } from "../../../fetch/ProdutoRequests";
-import type { ProdutoDTO } from "../../../dto/ProdutoDTO";
+import type {ProdutoDTO} from "../../../dto/ProdutoDTO";
 import "./PListagemProduto.css";
 
 export function PListagemProduto() {
@@ -33,6 +34,28 @@ export function PListagemProduto() {
     return isNaN(num) ? "0.00" : num.toFixed(2);
   };
 
+  const handleEditar = (id: number | string) => {
+    navigate(`/cadastro/produto?id=${id}`);
+  };
+
+  const handleDeletar = async (id: number | string) => {
+    if (!window.confirm("Tem certeza que deseja excluir este produto?")) return;
+
+    try {
+      const sucesso = await ProdutoRequests.deletar(id);
+
+      if (sucesso) {
+        setProdutos((prev) =>
+          prev.filter((p: any) => (p.id_produto ?? p.id) !== id)
+        );
+      } else {
+        alert("Erro ao excluir o produto.");
+      }
+    } catch (err) {
+      alert("Erro ao conectar com o servidor para exclusão.");
+    }
+  };
+
   if (carregando) return <p className="mensagem-status">Carregando produtos...</p>;
   if (erro) return <p className="mensagem-erro">Erro ao conectar com o servidor na porta 3000.</p>;
 
@@ -49,44 +72,57 @@ export function PListagemProduto() {
       </div>
 
       {produtos.length === 0 ? (
-        <p className="mensagem-status">Nenhum produto cadastrado.</p>
+        <p className="mensagem-status">Nenhum produto registrado.</p>
       ) : (
-        <table className="tabela-produtos">
-          <thead>
-            <tr>
-              <th>ID Produto</th>
-              <th>ID Categoria</th>
-              <th>Código</th>
-              <th>Nome</th>
-              <th>Descrição</th>
-              <th>Preço Unitário</th>
-              <th>Qtd. Disponível</th>
-            </tr>
-          </thead>
-          <tbody>
-            {produtos.map((prod: any, index) => {
-              const idProduto = prod.id_produto ?? prod.id ?? "-";
-              const idCategoria = prod.id_categoria ?? prod.categoriaId ?? prod.categoria_id ?? "-";
-              const codigo = prod.codigo ?? prod.codigo_produto ?? "-";
-              const nome = prod.nome ?? "-";
-              const descricao = prod.descricao ?? "-";
-              const preco = formatarPreco(prod.preco_unitario ?? prod.preco);
-              const qtdDisponivel = prod.quantidade_disponivel ?? prod.quantidadeEstoque ?? prod.quantidade ?? 0;
+        <div className="tabela-responsive">
+          <table className="tabela-listagem">
+            <thead>
+              <tr>
+                <th>ID PRODUTO</th>
+                <th>NOME</th>
+                <th>CATEGORIA</th>
+                <th>PREÇO</th>
+                <th>ESTOQUE</th>
+                <th>AÇÕES</th>
+              </tr>
+            </thead>
+            <tbody>
+              {produtos.map((prod: any, index) => {
+                const idProd = prod.id_produto ?? prod.id ?? prod.idProduto ?? "-";
+                const nome = prod.nome_produto ?? prod.nome ?? "-";
+                const categoria = prod.categoria_nome ?? prod.categoria ?? prod.id_categoria ?? "-";
+                const preco = formatarPreco(prod.preco_unitario ?? prod.preco ?? 0);
+                const estoque = prod.quantidade_estoque ?? prod.estoque ?? prod.quantidade ?? 0;
 
-              return (
-                <tr key={idProduto !== "-" ? idProduto : index}>
-                  <td>{idProduto}</td>
-                  <td>{idCategoria}</td>
-                  <td>{codigo}</td>
-                  <td>{nome}</td>
-                  <td>{descricao}</td>
-                  <td>R$ {preco}</td>
-                  <td>{qtdDisponivel}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                return (
+                  <tr key={idProd !== "-" ? idProd : index}>
+                    <td>{idProd}</td>
+                    <td>{nome}</td>
+                    <td>{categoria}</td>
+                    <td>R$ {preco}</td>
+                    <td>{estoque}</td>
+                    <td>
+                      <div className="coluna-acoes">
+                        <button 
+                          className="btn-acao btn-atualizar"
+                          onClick={() => handleEditar(idProd)}
+                        >
+                          Atualizar
+                        </button>
+                        <button 
+                          className="btn-acao btn-deletar"
+                          onClick={() => handleDeletar(idProd)}
+                        >
+                          Deletar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
