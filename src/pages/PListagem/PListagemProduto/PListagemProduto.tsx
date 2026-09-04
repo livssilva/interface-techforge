@@ -24,7 +24,15 @@ export function PListagemProduto() {
     setErro(false);
     try {
       const dados = await ProdutoRequests.listarTodos();
-      setProdutos(dados);
+
+      // Ordena por código/ID crescente para garantir que o cadastro mais recente fique no fim da lista
+      const ordenados = [...dados].sort((a, b) => {
+        const idA = Number(a.codigo_produto) || 0;
+        const idB = Number(b.codigo_produto) || 0;
+        return idA - idB;
+      });
+
+      setProdutos(ordenados);
     } catch (error) {
       setErro(true);
     } finally {
