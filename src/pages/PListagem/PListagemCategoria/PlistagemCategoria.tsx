@@ -1,3 +1,4 @@
+// src/pages/PListagem/PListagemCategoria/PListagemCategoria.tsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CategoriaRequests } from "../../../fetch/CategoriaRequests";
@@ -28,13 +29,35 @@ export function PListagemCategoria() {
     carregarCategorias();
   }, []);
 
+  const handleEditar = (id: number | string) => {
+    navigate(`/cadastro/categoria?id=${id}`);
+  };
+
+  const handleDeletar = async (id: number | string) => {
+    if (!window.confirm("Tem certeza que deseja excluir esta categoria?")) return;
+
+    try {
+      const sucesso = await CategoriaRequests.deletar(id);
+
+      if (sucesso) {
+        setCategorias((prev) =>
+          prev.filter((c: any) => (c.id_categoria ?? c.id) !== id)
+        );
+      } else {
+        alert("Erro ao excluir a categoria.");
+      }
+    } catch (err) {
+      alert("Erro ao conectar com o servidor para exclusão.");
+    }
+  };
+
   if (carregando) return <p className="mensagem-status">Carregando categorias...</p>;
   if (erro) return <p className="mensagem-erro">Erro ao conectar com o servidor na porta 3000.</p>;
 
   return (
     <div className="container-listagem">
       <div className="header-listagem">
-        <h2>Lista de Categorias</h2>
+        <h2>Listagem de Categorias</h2>
         <button 
           className="btn-cadastrar" 
           onClick={() => navigate("/cadastro/categoria")}
@@ -44,29 +67,51 @@ export function PListagemCategoria() {
       </div>
 
       {categorias.length === 0 ? (
-        <p className="mensagem-status">Nenhuma categoria encontrada.</p>
+        <p className="mensagem-status">Nenhuma categoria registrada.</p>
       ) : (
-        <table className="tabela-categorias">
-          <thead>
-            <tr>
-              <th>ID Categoria</th>
-              <th>Nome</th>
-            </tr>
-          </thead>
-          <tbody>
-            {categorias.map((cat: any, index) => {
-              const idCategoria = cat.id_categoria ?? cat.id ?? cat.idCategoria ?? "-";
-              const nome = cat.nome ?? cat.nomeCategoria ?? "-";
+        <div className="tabela-responsive">
+          <table className="tabela-listagem">
+            <thead>
+              <tr>
+                <th>ID CATEGORIA</th>
+                <th>NOME</th>
+                <th>DESCRIÇÃO</th>
+                <th>AÇÕES</th>
+              </tr>
+            </thead>
+            <tbody>
+              {categorias.map((cat: any, index) => {
+                const idCat = cat.id_categoria ?? cat.id ?? cat.idCategoria ?? "-";
+                const nome = cat.nome_categoria ?? cat.nome ?? "-";
+                const descricao = cat.descricao ?? cat.desc ?? "-";
 
-              return (
-                <tr key={idCategoria !== "-" ? idCategoria : index}>
-                  <td>{idCategoria}</td>
-                  <td>{nome}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                return (
+                  <tr key={idCat !== "-" ? idCat : index}>
+                    <td>{idCat}</td>
+                    <td>{nome}</td>
+                    <td>{descricao}</td>
+                    <td>
+                      <div className="coluna-acoes">
+                        <button 
+                          className="btn-acao btn-atualizar"
+                          onClick={() => handleEditar(idCat)}
+                        >
+                          Atualizar
+                        </button>
+                        <button 
+                          className="btn-acao btn-deletar"
+                          onClick={() => handleDeletar(idCat)}
+                        >
+                          Deletar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
