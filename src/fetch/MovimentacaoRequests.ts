@@ -16,6 +16,19 @@ export class MovimentacaoRequests {
     }
   }
 
+  static async buscarPorId(id: number | string): Promise<MovimentacaoDTO | null> {
+    try {
+      const response = await fetch(`${API_URL}/${id}`);
+      if (!response.ok) throw new Error(`Erro ao buscar movimentação ${id}.`);
+
+      const dado = await response.json();
+      return dado;
+    } catch (error) {
+      console.error(`Erro em MovimentacaoRequests.buscarPorId (${id}):`, error);
+      return null;
+    }
+  }
+
   static async cadastrar(movimentacao: Partial<MovimentacaoDTO>): Promise<boolean> {
     try {
       const response = await fetch(API_URL, {
@@ -26,6 +39,32 @@ export class MovimentacaoRequests {
       return response.ok;
     } catch (error) {
       console.error('Erro em MovimentacaoRequests.cadastrar:', error);
+      return false;
+    }
+  }
+
+  static async atualizar(id: number | string, movimentacao: Partial<MovimentacaoDTO>): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(movimentacao)
+      });
+      return response.ok;
+    } catch (error) {
+      console.error(`Erro em MovimentacaoRequests.atualizar (${id}):`, error);
+      return false;
+    }
+  }
+
+  static async deletar(id: number | string): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'DELETE'
+      });
+      return response.ok;
+    } catch (error) {
+      console.error(`Erro em MovimentacaoRequests.deletar (${id}):`, error);
       return false;
     }
   }
