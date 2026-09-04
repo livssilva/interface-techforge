@@ -1,71 +1,62 @@
+// src/fetch/ProdutoRequests.ts
 import type { ProdutoDTO } from "../dto/ProdutoDTO";
 
-const BASE_URL = 'http://localhost:3000';
+const URL_BASE = "http://localhost:3000/produtos"; // Ajuste o endpoint conforme sua API
 
 export class ProdutoRequests {
-  // GET usa o PLURAL: /produtos
+  // Listar todos os produtos
   static async listarTodos(): Promise<ProdutoDTO[]> {
-    try {
-      const response = await fetch(`${BASE_URL}/produtos`);
-      if (!response.ok) throw new Error('Erro ao buscar produtos.');
-      
-      const dados = await response.json();
-      return Array.isArray(dados) ? dados : [];
-    } catch (error) {
-      console.error('Erro em ProdutoRequests.listarTodos:', error);
-      throw error;
-    }
+    const resposta = await fetch(URL_BASE);
+    if (!resposta.ok) throw new Error("Erro ao buscar produtos.");
+    return await resposta.json();
   }
 
-  static async buscarPorId(id: number | string): Promise<ProdutoDTO | null> {
+  // Cadastrar um novo produto
+  static async cadastrar(produto: ProdutoDTO): Promise<boolean> {
     try {
-      const response = await fetch(`${BASE_URL}/produto/${id}`);
-      if (!response.ok) throw new Error('Erro ao buscar produto.');
-
-      return await response.json();
-    } catch (error) {
-      console.error('Erro em ProdutoRequests.buscarPorId:', error);
-      return null;
-    }
-  }
-
-  static async cadastrar(produto: Partial<ProdutoDTO>): Promise<boolean> {
-    try {
-      const response = await fetch(`${BASE_URL}/produto`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(produto)
+      const resposta = await fetch(URL_BASE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(produto),
       });
-      return response.ok;
+
+      return resposta.ok;
     } catch (error) {
-      console.error('Erro em ProdutoRequests.cadastrar:', error);
+      console.error("Erro no cadastro de produto:", error);
       return false;
     }
   }
 
-  static async atualizar(id: number | string, produto: Partial<ProdutoDTO>): Promise<boolean> {
+  // Atualizar produto existente pelo código
+  static async atualizar(codigo: string, produto: Partial<ProdutoDTO>): Promise<boolean> {
     try {
-      const response = await fetch(`${BASE_URL}/produto/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(produto)
+      const resposta = await fetch(`${URL_BASE}/${codigo}`, {
+        method: "PUT", // Ou "PATCH", dependendo do seu backend
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(produto),
       });
-      return response.ok;
+
+      return resposta.ok;
     } catch (error) {
-      console.error('Erro em ProdutoRequests.atualizar:', error);
+      console.error("Erro ao atualizar produto:", error);
       return false;
     }
   }
 
-  // DELETE usa o SINGULAR: /produto/:id
-  static async deletar(id: number | string): Promise<boolean> {
+  // Deletar produto pelo código
+  static async deletar(codigo: string): Promise<boolean> {
     try {
-      const response = await fetch(`${BASE_URL}/produto/${id}`, {
-        method: 'DELETE'
+      const resposta = await fetch(`${URL_BASE}/${codigo}`, {
+        method: "DELETE",
       });
-      return response.ok;
+
+      return resposta.ok;
     } catch (error) {
-      console.error('Erro em ProdutoRequests.deletar:', error);
+      console.error("Erro ao excluir produto:", error);
       return false;
     }
   }
