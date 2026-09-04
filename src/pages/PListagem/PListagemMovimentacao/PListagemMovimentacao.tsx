@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+// src/pages/PListagem/PListagemMovimentacao/PListagemMovimentacao.tsx
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MovimentacaoRequests } from "../../../fetch/MovimentacaoRequests";
 import type MovimentacaoDTO from "../../../dto/MovimentacaoDTO";
@@ -10,12 +11,18 @@ export function PListagemMovimentacao() {
   const [erro, setErro] = useState(false);
   const navigate = useNavigate();
 
+  // Estados do Modal de Edição
+  const [movEditando, setMovEditando] = useState<MovimentacaoDTO | null>(null);
+  const [tipoEdit, setTipoEdit] = useState<'ENTRADA' | 'SAIDA'>("ENTRADA");
+  const [quantidadeEdit, setQuantidadeEdit] = useState<number>(0);
+  const [observacaoEdit, setObservacaoEdit] = useState<string>("");
+  const [salvando, setSalvando] = useState(false);
+
   const carregarMovimentacoes = async () => {
     setCarregando(true);
     setErro(false);
     try {
       const dados = await MovimentacaoRequests.listarTodas();
-      console.log("Dados recebidos da API /movimentacoes:", dados);
       setMovimentacoes(dados);
     } catch (error) {
       setErro(true);
@@ -28,31 +35,75 @@ export function PListagemMovimentacao() {
     carregarMovimentacoes();
   }, []);
 
-  const formatarData = (dataRaw: any) => {
+  const formatarData = (dataRaw?: Date | string) => {
     if (!dataRaw) return "-";
     const data = new Date(dataRaw);
     return isNaN(data.getTime()) ? "-" : data.toLocaleDateString("pt-BR");
   };
 
-  const formatarPreco = (val: any) => {
-    const num = Number(val);
-    return isNaN(num) ? "0.00" : num.toFixed(2);
+  const handleAbrirEditar = (mov: MovimentacaoDTO) => {
+    setMovEditando(mov);
+    setTipoEdit(mov.tipo);
+    setQuantidadeEdit(mov.quantidade);
+    setObservacaoEdit(mov.observacao || "");
   };
 
-  const handleEditar = (id: number | string) => {
-    navigate(`/cadastro/movimentacao?id=${id}`);
+  const handleFecharModal = () => {
+    setMovEditando(null);
+    setTipoEdit("ENTRADA");
+    setQuantidadeEdit(0);
+    setObservacaoEdit("");
   };
 
-  const handleDeletar = async (id: number | string) => {
+  const handleSalvarAtualizacao = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!movEditando || !movEditando.id_movimentacao) return;
+
+    const id = movEditando.id_movimentacao;
+    setSalvando(true);
+
+    try {
+      const dadosAtualizados: Partial<MovimentacaoDTO> = {
+        ...movEditando,
+        tipo: tipoEdit,
+        quantidade: Number(quantidadeEdit),
+        observacao: observacaoEdit,
+      };
+
+      const sucesso = await MovimentacaoRequests.atualizar(id, dadosAtualizados);
+
+      if (sucesso) {
+        setMovimentacoes((prev) =>
+          prev.map((m) =>
+            m.id_movimentacao === id
+              ? {
+                  ...m,
+                  tipo: tipoEdit,
+                  quantidade: Number(quantidadeEdit),
+                  observacao: observacaoEdit,
+                }
+              : m
+          )
+        );
+        handleFecharModal();
+      } else {
+        alert("Erro ao atualizar a movimentação.");
+      }
+    } catch (err) {
+      alert("Erro ao conectar com o servidor.");
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  const handleDeletar = async (id?: number) => {
+    if (!id) return;
     if (!window.confirm("Tem certeza que deseja excluir esta movimentação?")) return;
 
     try {
       const sucesso = await MovimentacaoRequests.deletar(id);
-
       if (sucesso) {
-        setMovimentacoes((prev) =>
-          prev.filter((m: any) => (m.id_movimentacao ?? m.id) !== id)
-        );
+        setMovimentacoes((prev) => prev.filter((m) => m.id_movimentacao !== id));
       } else {
         alert("Erro ao excluir a movimentação.");
       }
@@ -87,37 +138,34 @@ export function PListagemMovimentacao() {
                 <th>ID PRODUTO</th>
                 <th>TIPO</th>
                 <th>QUANTIDADE</th>
-                <th>VALOR TOTAL</th>
                 <th>DATA</th>
-                <th>Ações</th>
+                <th>OBSERVAÇÃO</th>
+                <th>AÇÕES</th>
               </tr>
             </thead>
             <tbody>
-              {movimentacoes.map((mov: any, index) => {
-                const idMov = mov.id_movimentacao ?? mov.id ?? mov.idMovimentacao ?? "-";
-                const idProd = mov.id_produto ?? mov.produtoId ?? mov.produto_id ?? "-";
-                const tipo = (mov.tipo ?? "ENTRADA").toUpperCase();
-                const quantidade = mov.quantidade ?? mov.qtd ?? 0;
-                const valorTotal = formatarPreco(mov.valor_total ?? mov.valorTotal ?? mov.preco_total ?? 0);
-                const data = formatarData(mov.data_movimentacao ?? mov.data);
+              {movimentacoes.map((mov, index) => {
+                const idMov = mov.id_movimentacao;
+                const idProd = mov.id_produto;
+                const data = formatarData(mov.data_movimentacao);
 
                 return (
-                  <tr key={idMov !== "-" ? idMov : index}>
-                    <td>{idMov}</td>
+                  <tr key={idMov ?? index}>
+                    <td>{idMov ?? "-"}</td>
                     <td>{idProd}</td>
                     <td>
-                      <span className={tipo === 'ENTRADA' ? 'badge-entrada' : 'badge-saida'}>
-                        {tipo}
+                      <span className={mov.tipo === 'ENTRADA' ? 'badge-entrada' : 'badge-saida'}>
+                        {mov.tipo}
                       </span>
                     </td>
-                    <td>{quantidade}</td>
-                    <td>R$ {valorTotal}</td>
+                    <td>{mov.quantidade}</td>
                     <td>{data}</td>
+                    <td>{mov.observacao || "-"}</td>
                     <td>
                       <div className="coluna-acoes">
                         <button 
                           className="btn-acao btn-atualizar"
-                          onClick={() => handleEditar(idMov)}
+                          onClick={() => handleAbrirEditar(mov)}
                         >
                           Atualizar
                         </button>
@@ -134,6 +182,59 @@ export function PListagemMovimentacao() {
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Modal de Edição */}
+      {movEditando && (
+        <div className="modal-overlay" onClick={handleFecharModal}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Atualizar Movimentação #{movEditando.id_movimentacao}</h3>
+              <button className="btn-fechar" onClick={handleFecharModal}>&times;</button>
+            </div>
+            
+            <form onSubmit={handleSalvarAtualizacao}>
+              <div className="form-group">
+                <label>Tipo de Movimentação:</label>
+                <select
+                  value={tipoEdit}
+                  onChange={(e) => setTipoEdit(e.target.value as 'ENTRADA' | 'SAIDA')}
+                >
+                  <option value="ENTRADA">ENTRADA</option>
+                  <option value="SAIDA">SAÍDA</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Quantidade:</label>
+                <input
+                  type="number"
+                  value={quantidadeEdit}
+                  onChange={(e) => setQuantidadeEdit(Number(e.target.value))}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Observação:</label>
+                <textarea
+                  value={observacaoEdit}
+                  onChange={(e) => setObservacaoEdit(e.target.value)}
+                  rows={3}
+                />
+              </div>
+
+              <div className="modal-acoes">
+                <button type="button" className="btn-cancelar" onClick={handleFecharModal}>
+                  Cancelar
+                </button>
+                <button type="submit" className="btn-salvar" disabled={salvando}>
+                  {salvando ? "Salvando..." : "Salvar Alterações"}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
