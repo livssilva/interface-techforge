@@ -1,6 +1,5 @@
 import type MovimentacaoDTO from "../dto/MovimentacaoDTO";
-
-const API_URL = "http://localhost:3000";
+import { API_URL } from '../config/api';
 
 function getHeaders(includeContentType = true): HeadersInit {
     const headers: Record<string, string> = {};

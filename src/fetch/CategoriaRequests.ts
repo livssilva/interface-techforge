@@ -1,7 +1,7 @@
 // src/fetch/CategoriaRequests.ts
 import type CategoriaDTO from '../dto/CategoriaDTO';
+import { API_URL } from '../config/api';
 
-const BASE_URL = 'http://localhost:3000';
 
 function getHeaders(includeContentType = true): HeadersInit {
     const headers: Record<string, string> = {};
@@ -22,7 +22,7 @@ export class CategoriaRequests {
    */
   static async listarTodas(): Promise<CategoriaDTO[]> {
     try {
-      const response = await fetch(`${BASE_URL}/categorias`, {
+      const response = await fetch(`${API_URL}/categorias`, {
         headers: getHeaders(false)
       });
       if (!response.ok) throw new Error('Erro ao buscar categorias.');
@@ -41,7 +41,7 @@ export class CategoriaRequests {
    */
   static async buscarPorId(id: number | string): Promise<CategoriaDTO | null> {
     try {
-      const response = await fetch(`${BASE_URL}/categoria/${id}`, {
+      const response = await fetch(`${API_URL}/categoria/${id}`, {
         headers: getHeaders(false)
       });
       if (!response.ok) return null;
@@ -59,7 +59,7 @@ export class CategoriaRequests {
    */
   static async cadastrar(categoria: Partial<CategoriaDTO>): Promise<boolean> {
     try {
-      const response = await fetch(`${BASE_URL}/categoria`, {
+      const response = await fetch(`${API_URL}/categoria`, {
         method: 'POST',
         headers: getHeaders(true),
         body: JSON.stringify(categoria),
@@ -77,7 +77,7 @@ export class CategoriaRequests {
    */
   static async atualizar(id: number | string, categoria: Partial<CategoriaDTO>): Promise<boolean> {
     try {
-      const response = await fetch(`${BASE_URL}/categoria/${id}`, {
+      const response = await fetch(`${API_URL}/categoria/${id}`, {
         method: 'PUT',
         headers: getHeaders(true),
         body: JSON.stringify(categoria),
@@ -91,7 +91,7 @@ export class CategoriaRequests {
 
   static async deletar(id: number | string): Promise<{ sucesso: boolean; mensagem?: string }> {
     try {
-        const response = await fetch(`${BASE_URL}/categoria/${id}`, {
+        const response = await fetch(`${API_URL}/categoria/${id}`, {
             method: 'DELETE',
             headers: getHeaders(false),
         });

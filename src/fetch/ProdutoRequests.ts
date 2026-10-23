@@ -1,6 +1,6 @@
 import type { ProdutoDTO } from "../dto/ProdutoDTO";
+import { API_URL } from '../config/api';
 
-const API_URL = "http://localhost:3000";
 
 function getHeaders(includeContentType = true): HeadersInit {
     const headers: Record<string, string> = {};
