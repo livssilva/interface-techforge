@@ -12,9 +12,9 @@ function AppContent() {
   const ehTelaBoasVindas = location.pathname === "/" && !autenticado;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%', maxWidth: '100%', overflowX: 'hidden' }}>
       {!ehTelaBoasVindas && <Navbar />}
-      <main style={{ flex: 1 }}>
+      <main style={{ flex: 1, width: '100%', maxWidth: '100%', display: 'flex', flexDirection: 'column' }}>
         <Rotas />
       </main>
       {!ehTelaBoasVindas && <Rodape />}

@@ -3,8 +3,10 @@
   flex: 1;
   justify-content: center;
   align-items: center;
-  padding: 32px 16px;
-  background-color: transparent; /* Remove o fundo sólido do container */
+  padding: clamp(20px, 4vw, 40px) 16px;
+  background-color: transparent;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-wrapper {
@@ -13,21 +15,25 @@
 }
 
 .form-card {
-  background-color: rgba(31, 41, 55, 0.85); /* 85% de opacidade do --bg-card (#1f2937) */
-  backdrop-filter: blur(12px);              /* Efeito de vidro desfocado exibindo o GIF ao fundo */
+  background-color: rgba(31, 41, 55, 0.88);
+  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-ui);
   border-radius: var(--radius-ui);
   padding: 32px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .form-title {
-  font-size: 2rem;
+  font-size: clamp(1.4rem, 4vw, 2rem);
   font-weight: 700;
   color: var(--text-primary);
   text-align: center;
   margin-bottom: 28px;
+  margin-top: 0;
+  word-break: break-word;
 }
 
 .form-grid {
@@ -39,16 +45,19 @@
 .form-row {
   display: flex;
   gap: 16px;
+  width: 100%;
 }
 
 .form-row .form-group {
   flex: 1;
+  min-width: 0;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
 }
 
 .form-group.full-width {
@@ -59,6 +68,13 @@
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-secondary);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-actions {
@@ -79,6 +95,9 @@
   border: none;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-submit:hover {
@@ -97,6 +116,9 @@
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-cancel:hover {
@@ -104,8 +126,33 @@
   color: var(--text-primary);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
+  .form-main-container {
+    padding: 16px 12px;
+  }
+
+  .form-card {
+    padding: 20px 14px;
+    border-radius: 10px;
+  }
+
+  .form-grid {
+    gap: 14px;
+  }
+
   .form-row {
     flex-direction: column;
+    gap: 14px;
+  }
+
+  .form-actions {
+    margin-top: 20px;
+    gap: 10px;
+  }
+
+  .btn-submit,
+  .btn-cancel {
+    padding: 12px;
+    font-size: 0.92rem;
   }
 }

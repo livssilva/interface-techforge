@@ -1,76 +1,158 @@
-.cadastro-container {
+.form-main-container {
   display: flex;
+  flex: 1;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 80px);
-  padding: 20px;
-}
-
-.cadastro-card {
-  background-color: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 12px;
-  padding: 32px;
+  padding: clamp(20px, 4vw, 40px) 16px;
+  background-color: transparent;
   width: 100%;
-  max-width: 500px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
 }
 
-.cadastro-form {
+.form-wrapper {
+  width: 100%;
+  max-width: 700px;
+}
+
+.form-card {
+  background-color: rgba(31, 41, 55, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-ui);
+  border-radius: var(--radius-ui);
+  padding: 32px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.form-title {
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 28px;
+  margin-top: 0;
+  word-break: break-word;
+}
+
+.form-grid {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
 }
 
-.cadastro-form .form-group {
+.form-row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.form-row .form-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  width: 100%;
 }
 
-.cadastro-form label {
-  color: #e2e8f0;
+.form-group.full-width {
+  width: 100%;
+}
+
+.form-group label {
   font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.cadastro-form input,
-.cadastro-form select,
-.cadastro-form textarea {
-  background-color: #0f172a;
-  border: 1px solid #334155;
-  border-radius: 6px;
-  padding: 10px 12px;
-  color: #f8fafc;
-  font-size: 0.95rem;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.cadastro-form input:focus,
-.cadastro-form select:focus,
-.cadastro-form textarea:focus {
-  border-color: #38bdf8;
-}
-
-.btn-salvar {
-  background-color: #0284c7;
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  padding: 12px;
   font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.btn-submit {
+  width: 100%;
+  background-color: var(--primary);
+  color: #ffffff;
+  padding: 14px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-submit:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-cancel {
+  width: 100%;
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border-ui);
+  padding: 14px;
+  border-radius: 8px;
+  font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
-  margin-top: 10px;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.btn-salvar:hover:not(:disabled) {
-  background-color: #0369a1;
+.btn-cancel:hover {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
 }
 
-.btn-salvar:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+@media (max-width: 640px) {
+  .form-main-container {
+    padding: 16px 12px;
+  }
+
+  .form-card {
+    padding: 20px 14px;
+    border-radius: 10px;
+  }
+
+  .form-grid {
+    gap: 14px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .form-actions {
+    margin-top: 20px;
+    gap: 10px;
+  }
+
+  .btn-submit,
+  .btn-cancel {
+    padding: 12px;
+    font-size: 0.92rem;
+  }
 }

@@ -133,7 +133,7 @@ export const PLogin: React.FC = () => {
                             <h2 style={styles.tituloModal}>
                                 {modalAtivo === 'login' ? 'Acessar Conta' : 'Criar Nova Conta'}
                             </h2>
-                            <button onClick={fecharModal} style={styles.botaoFechar}>
+                            <button onClick={fecharModal} style={styles.botaoFechar} aria-label="Fechar">
                                 ✕
                             </button>
                         </div>
@@ -225,13 +225,15 @@ const styles: { [key: string]: React.CSSProperties } = {
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '100vh',
-        width: '100vw',
-        padding: '2rem',
+        width: '100%',
+        maxWidth: '100%',
+        padding: 'clamp(1.5rem, 5vw, 2.5rem) 1.25rem',
         boxSizing: 'border-box',
     },
     heroContent: {
         textAlign: 'center',
         maxWidth: '680px',
+        width: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -248,22 +250,27 @@ const styles: { [key: string]: React.CSSProperties } = {
         letterSpacing: '0.5px',
     },
     tituloHero: {
-        fontSize: '2.8rem',
+        fontSize: 'clamp(1.8rem, 5vw, 2.8rem)',
         color: '#ffffff',
         fontWeight: '700',
         lineHeight: '1.2',
         margin: 0,
+        wordBreak: 'break-word',
     },
     subtituloHero: {
-        fontSize: '1.1rem',
+        fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
         color: 'rgba(255, 255, 255, 0.75)',
         lineHeight: '1.6',
         margin: 0,
+        maxWidth: '100%',
     },
     containerBotoes: {
         display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
         gap: '1rem',
         marginTop: '1rem',
+        width: '100%',
     },
     botaoPrincipal: {
         padding: '0.85rem 2rem',
@@ -275,6 +282,9 @@ const styles: { [key: string]: React.CSSProperties } = {
         borderRadius: '8px',
         cursor: 'pointer',
         boxShadow: '0 4px 14px rgba(79, 70, 229, 0.4)',
+        minWidth: '160px',
+        flex: '1 1 180px',
+        maxWidth: '240px',
     },
     botaoSecundario: {
         padding: '0.85rem 2rem',
@@ -286,29 +296,37 @@ const styles: { [key: string]: React.CSSProperties } = {
         borderRadius: '8px',
         cursor: 'pointer',
         backdropFilter: 'blur(8px)',
+        minWidth: '160px',
+        flex: '1 1 180px',
+        maxWidth: '240px',
     },
     overlayModal: {
         position: 'fixed',
         top: 0,
         left: 0,
-        width: '100vw',
-        height: '100vh',
+        width: '100%',
+        height: '100%',
         backgroundColor: 'rgba(0, 0, 0, 0.65)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 1000,
+        padding: '1rem',
+        boxSizing: 'border-box',
     },
     cardGlassModal: {
-        width: '90%',
-        maxWidth: '380px',
-        padding: '2rem',
+        width: '100%',
+        maxWidth: '420px',
+        maxHeight: '90vh',
+        overflowY: 'auto',
+        padding: 'clamp(1.25rem, 4vw, 2rem)',
         borderRadius: '16px',
-        background: 'rgba(255, 255, 255, 0.1)',
+        background: 'rgba(30, 41, 59, 0.95)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         border: '1px solid rgba(255, 255, 255, 0.2)',
         boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.4)',
+        boxSizing: 'border-box',
     },
     headerModal: {
         display: 'flex',
@@ -327,6 +345,7 @@ const styles: { [key: string]: React.CSSProperties } = {
         color: '#ffffff',
         fontSize: '1.2rem',
         cursor: 'pointer',
+        padding: '4px 8px',
     },
     form: {
         display: 'flex',
@@ -350,10 +369,12 @@ const styles: { [key: string]: React.CSSProperties } = {
         color: '#ffffff',
         fontSize: '0.95rem',
         outline: 'none',
+        width: '100%',
+        boxSizing: 'border-box',
     },
     botaoSubmit: {
         marginTop: '0.5rem',
-        padding: '0.8rem',
+        padding: '0.85rem',
         borderRadius: '8px',
         border: 'none',
         background: '#4f46e5',
@@ -361,6 +382,7 @@ const styles: { [key: string]: React.CSSProperties } = {
         fontSize: '1rem',
         fontWeight: 'bold',
         cursor: 'pointer',
+        width: '100%',
     },
     footerModal: {
         marginTop: '1.2rem',
